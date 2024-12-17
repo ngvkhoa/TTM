@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chào Mừng</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #ffe6f2; /* Nền pastel hồng nhạt */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: column;
+            position: relative;
+            transition: all 0.5s ease-in-out;
+        }
+
+        /* Chữ chào */
+        h1 {
+            color: #d63384; /* Màu hồng đậm */
+            font-size: 40px;
+            margin: 0;
+            position: absolute;
+            top: 20%; /* Đưa chữ xuống thấp hơn */
+            opacity: 0;
+            transition: top 1s ease-out, opacity 1s ease-out;
+        }
+
+        /* Container chứa câu hỏi và nút */
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px; /* Khoảng cách giữa ô câu hỏi và nút trả lời */
+            opacity: 0;
+            transition: opacity 1s ease-out, transform 1s ease-out;
+            transform: translateY(30px);
+        }
+
+        .question-box {
+            background-color: #ffebf0; /* Hồng pastel nhạt */
+            border: 2px solid #f4b6c2;
+            border-radius: 10px;
+            text-align: center;
+            padding: 15px;
+            width: 300px;
+            font-size: 18px;
+            color: #333;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            opacity: 1;
+            transition: opacity 1s ease-out, transform 1s ease-out;
+            transform: translateY(20px);
+        }
+
+        /* Nút lựa chọn */
+        .button-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .button-box {
+            background-color: #e2f0cb; /* Xanh pastel nhạt */
+            border: 2px solid #b4d7a7;
+            border-radius: 10px;
+            text-align: center;
+            padding: 10px 20px;
+            width: 120px;
+            font-size: 16px;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .button-box:hover {
+            background-color: #b3e1a2; /* Xanh pastel đậm hơn khi hover */
+        }
+
+        .btn-no {
+            background-color: #f7d1d1; /* Đỏ pastel nhạt */
+            border-color: #e5a8a8;
+        }
+
+        .btn-no:hover {
+            background-color: #f3bdbd; /* Đỏ pastel đậm hơn khi hover */
+        }
+
+        /* Trái tim */
+        .heart {
+            position: absolute;
+            font-size: 40px;
+            animation: floatHearts 2s ease-in-out infinite;
+            opacity: 0;
+            transition: opacity 1s ease-out;
+        }
+
+        @keyframes floatHearts {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(-30px);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 0;
+            }
+        }
+
+        /* Ô mới thêm vào khi chọn "Có" */
+        .new-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #f3f3f3;
+            padding: 30px; /* Tăng kích thước của ô */
+            border-radius: 10px;
+            border: 2px solid #ddd;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 400px; /* Mở rộng chiều rộng */
+            font-size: 18px;
+            color: #333;
+            opacity: 0;
+            transition: opacity 1s ease-out;
+            z-index: 999; /* Đảm bảo ô này nằm trên các thành phần khác */
+        }
+
+        /* Nút liên kết trong ô mới */
+        .link-button {
+            background-color: #ffccff;
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 2px solid #ff99cc;
+            text-align: center;
+            color: #d63384;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px; /* Cách nút xuống dưới một chút */
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block; /* Đảm bảo nút không cùng dòng */
+        }
+
+        .link-button:hover {
+            background-color: #ff99cc;
+            color: #fff;
+        }
+
+        /* Đảm bảo nút liên kết nằm riêng biệt, không bị dính vào ô */
+        .link-button-container {
+            margin-top: 20px; /* Cách phần ô nội dung thêm chút */
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Chữ chào -->
+    <h1 id="welcomeMessage"></h1>
+
+    <!-- Ô câu hỏi và 2 nút trả lời -->
+    <div class="container" id="questionContainer">
+        <div class="question-box" id="questionBox">Nội dung để tôi chỉnh?</div>
+        <div class="button-container">
+            <div class="button-box" onclick="handleAnswer('Có')">Có</div>
+            <div class="button-box btn-no" id="noButton" onclick="handleAnswer('Không')">Không</div>
+        </div>
+    </div>
+
+    <script>
+        // Lấy tham số từ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const name = urlParams.get('name');
+
+        // Hiển thị lời chào
+        const welcomeMessage = document.getElementById('welcomeMessage');
+        if (name) {
+            welcomeMessage.innerText = 'Xin chào, ' + name + '!';
+        } else {
+            welcomeMessage.innerText = 'Xin chào!';
+        }
+
+        // Hiển thị hiệu ứng cho chữ chào
+        setTimeout(() => {
+            welcomeMessage.style.opacity = 1;
+            welcomeMessage.style.top = '15%';
+        }, 500);
+
+        // Hiển thị ô câu hỏi sau khi animation chữ chào kết thúc
+        setTimeout(() => {
+            const container = document.getElementById('questionContainer');
+            container.style.opacity = 1;
+            container.style.transform = 'translateY(0)';
+        }, 2000); // Sau 2 giây (thời gian hiệu ứng chữ chào)
+
+        // Xử lý câu trả lời
+        let heartsShown = false; // Biến để theo dõi việc trái tim đã được hiển thị chưa
+        function handleAnswer(answer) {
+            if (answer === 'Có' && !heartsShown) {
+                heartsShown = true;
+                showHearts(); // Hiển thị trái tim khi chọn "Có"
+                showNewBox();  // Hiển thị ô mới ở trên cùng khi chọn "Có"
+            } else if (answer === 'Không') {
+                moveNoButton(); // Di chuyển nút "Không" khi chọn "Không"
+            }
+        }
+
+        // Hiển thị trái tim liên tục khi chọn "Có"
+        function showHearts() {
+            const body = document.querySelector('body');
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.classList.add('heart');
+                heart.innerHTML = '❤️';
+                heart.style.left = `${Math.random() * 100}vw`; // Vị trí ngang ngẫu nhiên
+                heart.style.top = `${Math.random() * 100}vh`; // Vị trí dọc ngẫu nhiên
+                body.appendChild(heart);
+                setTimeout(() => {
+                    heart.style.opacity = 1;
+                }, 100);
+                setTimeout(() => {
+                    heart.style.opacity = 0;
+                    setTimeout(() => heart.remove(), 1000); // Xóa trái tim sau khi hiệu ứng kết thúc
+                }, 3000); // Trái tim biến mất sau 3 giây
+            }, 50); // Trái tim sẽ xuất hiện mỗi 50ms (tần suất dày hơn)
+        }
+
+        // Di chuyển nút "Không" khi chọn "Không"
+        function moveNoButton() {
+            const noButton = document.getElementById('noButton');
+            const maxX = window.innerWidth * 0.3 - noButton.offsetWidth - 20; // Giới hạn trong 30% chiều ngang
+            const maxY = window.innerHeight * 0.3 - noButton.offsetHeight - 20; // Giới hạn trong 30% chiều dọc
+            const randomX = Math.random() * maxX;
+            const randomY = Math.random() * maxY;
+            noButton.style.transition = 'all 0.5s ease'; // Di chuyển nhanh hơn
+            noButton.style.transform = `translate(${randomX}px, ${randomY}px)`;
+        }
+
+        // Hiển thị ô mới khi chọn "Có"
+        function showNewBox() {
+            const newBox = document.createElement('div');
+            newBox.classList.add('new-box');
+            newBox.innerText = 'Bạn vừa chọn "Có"!';
+            document.body.appendChild(newBox);
+            setTimeout(() => {
+                newBox.style.opacity = 1;
+            }, 100);
+
+            // Tạo nút liên kết trong ô mới
+            const linkButtonContainer = document.createElement('div');
+            linkButtonContainer.classList.add('link-button-container');
+
+            const linkButton = document.createElement('a');
+            linkButton.href = 'https://www.facebook.com/ngvkhoa07'; // Liên kết trang Facebook của bạn
+            linkButton.classList.add('link-button');
+            linkButton.innerText = 'Đi đến trang Facebook';
+
+            linkButtonContainer.appendChild(linkButton);
+            newBox.appendChild(linkButtonContainer);
+        }
+    </script>
+</body>
+</html>
